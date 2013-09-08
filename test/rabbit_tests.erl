@@ -8,8 +8,11 @@
 run_test_() ->
     {setup, fun setup/0, fun cleanup/1,
         [
-            {"connection tests", [
-                    {"concurent channel", fun t1/0}
+            {"connection", [
+                    %{"concurent channel", fun t_a_1/0}
+                ]},
+            {"message", [
+                    {"basic", fun t_b_1/0}
                 ]}
         ]
     }.
@@ -35,7 +38,7 @@ cleanup(_) ->
 %% Test cases
 %% ===================================================================
 
-t1() ->
+t_a_1() ->
     Name = channel_1,
     P1 = proc_lib:spawn(?MODULE, t1_w, [self(), Name]),
     P2 = proc_lib:spawn(?MODULE, t1_w, [self(), Name]),
@@ -52,6 +55,17 @@ t1() ->
     ?assertMatch(P1R, P4R),
     ?assertMatch(P1R, P5R).
 
+t_b_1() ->
+    {Ch, Exc, Q, Key} = {channel_2, <<"usagi.test">>, 
+        <<"usagi_test_q">>, <<"usagi.key">>},
+    {Q, _, _} = usagi:start_queue(Ch, Q),
+    Pid = start_worker(),
+    {ok, _} = usagi:consume_queue(Ch, Q, Pid, true),
+    ok = usagi:start_exchange(Ch, Exc, <<"topic">>),
+    ok = usagi:bind_queue(Ch, Exc, Q, Key),
+    ok = usagi:publish(Ch, Exc, Key, <<"test_msg">>),
+    timer:sleep(100),
+    <<"test_msg">> = check_worker(Pid).
 
 %% ===================================================================
 %% Helpers
@@ -69,4 +83,21 @@ get_result(Pid) ->
     receive
         {Pid, Res} ->
             Res
+    end.
+
+start_worker() ->
+    proc_lib:spawn(fun() -> worker() end).
+
+check_worker(Pid) ->
+    Pid ! {self(), check},
+    receive
+        {Pid, Msg} ->
+            Msg
+    end.
+
+worker() ->
+    {usagi, Msg} = usagi:get_msg(),
+    receive
+        {Pid, check} ->
+            Pid ! {self(), Msg}
     end.

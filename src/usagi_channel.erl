@@ -81,7 +81,7 @@ consume_queue(Channel, Queue, Receiver, NoAck) ->
     Sub = #'basic.consume'{queue = queue(Queue), no_ack = NoAck},
     case catch amqp_channel:subscribe(channel(Channel), Sub, Receiver) of
         #'basic.consume_ok'{consumer_tag=Tag} ->
-            Tag;
+            {ok, Tag};
         {'EXIT', {{shutdown,{server_initiated_close,404,_}},_}} -> 
             ?error("queue ~p not found", [Queue]),
             {error, queue_not_found};
