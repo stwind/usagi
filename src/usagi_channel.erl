@@ -1,6 +1,5 @@
 -module(usagi_channel).
 
--export([start_link/3]).
 -export([start_exchange/3]).
 -export([start_queue/2]).
 -export([bind_exchange/4]).
@@ -30,10 +29,6 @@
 %% ============================================================================
 %% API
 %% ============================================================================
-
-start_link(Name, Rabbit, Prefetch) ->
-    ?info("opening rabbit channel to ~p: ~p",[Rabbit, Name]),
-    gen_server:start_link({local, Name}, ?MODULE, [Rabbit, Prefetch], []).
 
 start_exchange(Channel, Name, Type) ->
     Method = #'exchange.declare'{exchange=Name,type = Type},
