@@ -11,4 +11,5 @@ exec $ERL -pa ebin \
     -setcookie $COOKIE \
     -env ERL_LIBS $LIBS_DIR \
     -config $CONFIG \
-    -s usagi
+    -s usagi \
+    -s sync go

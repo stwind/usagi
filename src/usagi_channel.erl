@@ -145,7 +145,7 @@ qos(Channel, Prefetch) ->
 declare_queue(Queue) when is_binary(Queue) ->
     #'queue.declare'{queue = Queue};
 declare_queue({Queue, Expires}) ->
-    Args = [{<<"x-expires">>, short, Expires}],
+    Args = [{<<"x-expires">>, long, Expires}],
     #'queue.declare'{queue = Queue, arguments = Args}.
 
 queue({Queue,_}) -> Queue;
@@ -154,13 +154,13 @@ queue(Queue) -> Queue.
 call_channel(Channel, Method) ->
     case catch amqp_channel:call(channel(Channel), Method) of
         {'EXIT', {{shutdown,Reason},_Stack}} ->
-            ?error("call method ~p rabbit channel failed ~p: ~p",
+            ?error("call method ~p rabbit channel failed ~p:~n ~p",
                 [Method, Channel,Reason]),
-            {error, Reason};
+            throw({error, Reason});
         {'EXIT', Reason} ->
-            ?error("call method ~p rabbit channel failed ~p: ~p",
+            ?error("call method ~p rabbit channel failed ~p:~n ~p",
                 [Method, Channel,Reason]),
-            {error, Reason};
+            throw({error, Reason});
         Result -> 
             Result
     end.
