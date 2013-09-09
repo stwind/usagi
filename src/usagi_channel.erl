@@ -1,6 +1,5 @@
 -module(usagi_channel).
 
--export([start_link/3]).
 -export([start_exchange/3]).
 -export([start_queue/2]).
 -export([bind_exchange/4]).
@@ -30,10 +29,6 @@
 %% ============================================================================
 %% API
 %% ============================================================================
-
-start_link(Name, Rabbit, Prefetch) ->
-    ?info("opening rabbit channel to ~p: ~p",[Rabbit, Name]),
-    gen_server:start_link({local, Name}, ?MODULE, [Rabbit, Prefetch], []).
 
 start_exchange(Channel, Name, Type) ->
     Method = #'exchange.declare'{exchange=Name,type = Type},
@@ -86,7 +81,7 @@ consume_queue(Channel, Queue, Receiver, NoAck) ->
     Sub = #'basic.consume'{queue = queue(Queue), no_ack = NoAck},
     case catch amqp_channel:subscribe(channel(Channel), Sub, Receiver) of
         #'basic.consume_ok'{consumer_tag=Tag} ->
-            Tag;
+            {ok, Tag};
         {'EXIT', {{shutdown,{server_initiated_close,404,_}},_}} -> 
             ?error("queue ~p not found", [Queue]),
             {error, queue_not_found};
@@ -145,7 +140,7 @@ qos(Channel, Prefetch) ->
 declare_queue(Queue) when is_binary(Queue) ->
     #'queue.declare'{queue = Queue};
 declare_queue({Queue, Expires}) ->
-    Args = [{<<"x-expires">>, short, Expires}],
+    Args = [{<<"x-expires">>, long, Expires}],
     #'queue.declare'{queue = Queue, arguments = Args}.
 
 queue({Queue,_}) -> Queue;
@@ -154,13 +149,13 @@ queue(Queue) -> Queue.
 call_channel(Channel, Method) ->
     case catch amqp_channel:call(channel(Channel), Method) of
         {'EXIT', {{shutdown,Reason},_Stack}} ->
-            ?error("call method ~p rabbit channel failed ~p: ~p",
+            ?error("call method ~p rabbit channel failed ~p:~n ~p",
                 [Method, Channel,Reason]),
-            {error, Reason};
+            throw({error, Reason});
         {'EXIT', Reason} ->
-            ?error("call method ~p rabbit channel failed ~p: ~p",
+            ?error("call method ~p rabbit channel failed ~p:~n ~p",
                 [Method, Channel,Reason]),
-            {error, Reason};
+            throw({error, Reason});
         Result -> 
             Result
     end.

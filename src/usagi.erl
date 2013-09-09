@@ -2,6 +2,7 @@
 
 -include("logging.hrl").
 -include_lib("amqp_client/include/amqp_client.hrl").
+-include_lib("eunit/include/eunit.hrl").
 
 -export([start/0, stop/0]).
 
@@ -118,7 +119,7 @@ get_msg() ->
         #'basic.cancel_ok'{} ->
             get_msg();
         {#'basic.deliver'{}, #amqp_msg{payload=Payload}} ->
-            Payload;
+            {usagi, Payload};
         Other ->
             Other
     end.

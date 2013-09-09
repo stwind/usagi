@@ -1,18 +1,4 @@
-%% -----------------------------------------------------------------------------
-%%
-%%             ____    ____  __    __  .__   __.  __    ______
-%%             \   \  /   / |  |  |  | |  \ |  | |  |  /  __  \  
-%%              \   \/   /  |  |  |  | |   \|  | |  | |  |  |  | 
-%%               \_    _/   |  |  |  | |  . `  | |  | |  |  |  | 
-%%                 |  |     |  `--'  | |  |\   | |  | |  `--'  | 
-%%                 |__|      \______/  |__| \__| |__|  \______/  
-%%                                                   
-%%                       Copyright (c) 2011 - 2013 Yunio.
-%%
-%% -----------------------------------------------------------------------------
 -module(usagi_agent).
-
--author('liquid@yun.io').
 
 -behaviour(gen_server).
 
@@ -94,6 +80,10 @@ handle_call({get_rabbit, Name}, _From, State) ->
 handle_call(_Call, _From, State) ->
     {reply, ok, State}.
 
+handle_cast({monitor_channel, Channel}, State) ->
+    erlang:monitor(process, Channel),
+    {noreply, State};
+
 handle_cast(_Request, State) ->
     {noreply, State}.
 
@@ -105,8 +95,7 @@ handle_info({retry_channel, Rabbit, Key}, State) ->
     {noreply, State};
 
 handle_info({'DOWN', _, _, Pid, Reason}, State) ->
-    ?error("connection down ~p", [Pid]),
-    {noreply, connection_down({Pid, Reason}, State)};
+    {noreply, maybe_connection_down({Pid, Reason}, State)};
 
 handle_info({nodedown, Node}, State) ->
     ?error("rabbit node down: ~p", [Node]),
@@ -159,9 +148,9 @@ monitor_rabbit(Conn, _) ->
     erlang:monitor(process, Conn).
 
 monitor_channel(Channel) ->
-    erlang:monitor(process, Channel).
+    gen_server:cast(?MODULE, {monitor_channel, Channel}).
 
-connection_down({Pid, Reason}, State) ->
+maybe_connection_down({Pid, Reason}, State) ->
     case ets:match(?RABBITS, {'$1', '$2', Pid}) of
         [[Name, Rabbit]] ->
             ?error("connection to rabbit ~p was down: ~p", 
@@ -176,7 +165,7 @@ connection_down({Pid, Reason}, State) ->
 channel_down({Pid, Reason}, State) ->
     case ets:match(?CHANNELS, {'$1', '$2', Pid}) of
         [[Key, Rabbit]] ->
-            ?error("channel ~p was down: ~p", [raw_key(Key), Reason]),
+            ?error("channel ~p (~p) was down: ~p", [raw_key(Key), Pid, Reason]),
             ets:delete(?CHANNELS, raw_key(Key)),
             retry_channel(Rabbit, Key, State);
         [] ->
@@ -215,7 +204,12 @@ do_get_rabbit(Name) ->
     end.
 
 default_rabbit() ->
-    ets:first(?RABBITS).
+    case ets:first(?RABBITS) of
+        '$end_of_table' ->
+            throw({error, no_available_rabbit});
+        Name ->
+            Name
+    end.
 
 open_channel({Rabbit, Conn}, Key0) ->
     Name = rabbit_name(Rabbit),
@@ -273,7 +267,7 @@ amqp_param(direct, Props) ->
 amqp_param(network, Props) ->
     Host = proplists:get_value(host, Props, "localhost"),
     Port = proplists:get_value(port, Props, 5672),
-    ?info("connecting to ~s:~p", [Host, Port]),
+    ?info("connecting to rabbit ~s:~p", [Host, Port]),
     #amqp_params_network{
         username = proplists:get_value(username, Props, <<"guest">>),
         password = proplists:get_value(password, Props, <<"guest">>),
