@@ -34,9 +34,13 @@
 %% Public
 %% ===================================================================
 
+%% @doc start usagi application.
+-spec start() -> ok.
 start() ->
     application:start(?MODULE).
 
+%% @doc stop usagi application.
+-spec stop() -> ok.
 stop() ->
     application:stop(?MODULE).
 

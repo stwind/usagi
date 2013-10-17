@@ -1,6 +1,12 @@
 
 
-# The usagi application #
+# Usagi Application #
+
+__Authors:__ stwind.
+
+
+## Overview
+Usagi is an application that provides higher-level wrapper for ampq_client, as well as features like reconnection.
 
 
 ## Modules ##

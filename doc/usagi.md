@@ -10,7 +10,7 @@
 ## Function Index ##
 
 
-<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#ack-2">ack/2</a></td><td></td></tr><tr><td valign="top"><a href="#ack-3">ack/3</a></td><td></td></tr><tr><td valign="top"><a href="#bind_exchange-4">bind_exchange/4</a></td><td></td></tr><tr><td valign="top"><a href="#bind_queue-4">bind_queue/4</a></td><td></td></tr><tr><td valign="top"><a href="#cancel_consume-2">cancel_consume/2</a></td><td></td></tr><tr><td valign="top"><a href="#close_channel-1">close_channel/1</a></td><td></td></tr><tr><td valign="top"><a href="#consume_queue-3">consume_queue/3</a></td><td></td></tr><tr><td valign="top"><a href="#consume_queue-4">consume_queue/4</a></td><td></td></tr><tr><td valign="top"><a href="#consumer_count-2">consumer_count/2</a></td><td></td></tr><tr><td valign="top"><a href="#delete_exchange-2">delete_exchange/2</a></td><td></td></tr><tr><td valign="top"><a href="#delete_queue-2">delete_queue/2</a></td><td></td></tr><tr><td valign="top"><a href="#discard-2">discard/2</a></td><td></td></tr><tr><td valign="top"><a href="#get_msg-0">get_msg/0</a></td><td></td></tr><tr><td valign="top"><a href="#get_msg-2">get_msg/2</a></td><td></td></tr><tr><td valign="top"><a href="#get_msg-3">get_msg/3</a></td><td></td></tr><tr><td valign="top"><a href="#msg_count-2">msg_count/2</a></td><td></td></tr><tr><td valign="top"><a href="#new_channel-1">new_channel/1</a></td><td></td></tr><tr><td valign="top"><a href="#new_channel-2">new_channel/2</a></td><td></td></tr><tr><td valign="top"><a href="#publish-4">publish/4</a></td><td></td></tr><tr><td valign="top"><a href="#reject-2">reject/2</a></td><td></td></tr><tr><td valign="top"><a href="#start-0">start/0</a></td><td></td></tr><tr><td valign="top"><a href="#start_exchange-3">start_exchange/3</a></td><td></td></tr><tr><td valign="top"><a href="#start_queue-2">start_queue/2</a></td><td></td></tr><tr><td valign="top"><a href="#stop-0">stop/0</a></td><td></td></tr><tr><td valign="top"><a href="#unpack-1">unpack/1</a></td><td></td></tr></table>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#ack-2">ack/2</a></td><td></td></tr><tr><td valign="top"><a href="#ack-3">ack/3</a></td><td></td></tr><tr><td valign="top"><a href="#bind_exchange-4">bind_exchange/4</a></td><td></td></tr><tr><td valign="top"><a href="#bind_queue-4">bind_queue/4</a></td><td></td></tr><tr><td valign="top"><a href="#cancel_consume-2">cancel_consume/2</a></td><td></td></tr><tr><td valign="top"><a href="#close_channel-1">close_channel/1</a></td><td></td></tr><tr><td valign="top"><a href="#consume_queue-3">consume_queue/3</a></td><td></td></tr><tr><td valign="top"><a href="#consume_queue-4">consume_queue/4</a></td><td></td></tr><tr><td valign="top"><a href="#consumer_count-2">consumer_count/2</a></td><td></td></tr><tr><td valign="top"><a href="#delete_exchange-2">delete_exchange/2</a></td><td></td></tr><tr><td valign="top"><a href="#delete_queue-2">delete_queue/2</a></td><td></td></tr><tr><td valign="top"><a href="#discard-2">discard/2</a></td><td></td></tr><tr><td valign="top"><a href="#get_msg-0">get_msg/0</a></td><td></td></tr><tr><td valign="top"><a href="#get_msg-2">get_msg/2</a></td><td></td></tr><tr><td valign="top"><a href="#get_msg-3">get_msg/3</a></td><td></td></tr><tr><td valign="top"><a href="#msg_count-2">msg_count/2</a></td><td></td></tr><tr><td valign="top"><a href="#new_channel-1">new_channel/1</a></td><td></td></tr><tr><td valign="top"><a href="#new_channel-2">new_channel/2</a></td><td></td></tr><tr><td valign="top"><a href="#publish-4">publish/4</a></td><td></td></tr><tr><td valign="top"><a href="#reject-2">reject/2</a></td><td></td></tr><tr><td valign="top"><a href="#start-0">start/0</a></td><td>start usagi application.</td></tr><tr><td valign="top"><a href="#start_exchange-3">start_exchange/3</a></td><td></td></tr><tr><td valign="top"><a href="#start_queue-2">start_queue/2</a></td><td></td></tr><tr><td valign="top"><a href="#stop-0">stop/0</a></td><td>stop usagi application.</td></tr><tr><td valign="top"><a href="#unpack-1">unpack/1</a></td><td></td></tr></table>
 
 
 <a name="functions"></a>
@@ -161,9 +161,13 @@
 
 ### start/0 ###
 
-`start() -> any()`
+
+<pre><code>
+start() -&gt; ok
+</code></pre>
 
 
+start usagi application.
 <a name="start_exchange-3"></a>
 
 ### start_exchange/3 ###
@@ -182,9 +186,13 @@
 
 ### stop/0 ###
 
-`stop() -> any()`
+
+<pre><code>
+stop() -&gt; ok
+</code></pre>
 
 
+stop usagi application.
 <a name="unpack-1"></a>
 
 ### unpack/1 ###

@@ -7,7 +7,7 @@
         code_change/3]).
 
 -export([
-        start_link/0,
+        start_link/1,
         add_rabbit/1,
         get_channel/1,
         get_channel/2
@@ -32,8 +32,8 @@
 %% API
 %% ===================================================================
 
-start_link() ->
-    gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
+start_link(Rabbits) ->
+    gen_server:start_link({local, ?SERVER}, ?MODULE, Rabbits, []).
 
 add_rabbit(Rabbit) ->
     gen_server:call(?SERVER, {add_rabbit, Rabbit}).
@@ -59,16 +59,10 @@ get_channel(Name, Key) ->
 %% gen_server
 %% ===================================================================
 
-init([]) ->
-    ?info("starting rabbit agent"),
-    case usagi_util:get_rabbits() of
-        [] ->
-            {stop, no_rabbit};
-        Rabbits ->
-            ets:new(?CHANNELS, [named_table,public]),
-            ets:new(?RABBITS, [named_table,public,{read_concurrency,true}]),
-            {ok, connect_rabbits(Rabbits, #state{})}
-    end.
+init(Rabbits) ->
+    ets:new(?CHANNELS, [named_table,public]),
+    ets:new(?RABBITS, [named_table,public,{read_concurrency,true}]),
+    {ok, connect_rabbits(Rabbits, #state{})}.
 
 handle_call({add_rabbit, Rabbit}, _From, State) ->
     {reply, ok, connect_rabbits([Rabbit], State)};
@@ -162,6 +156,8 @@ maybe_connection_down({Pid, Reason}, State) ->
             channel_down({Pid, Reason}, State)
     end.
 
+channel_down({_, normal}, State) ->
+    State;
 channel_down({Pid, Reason}, State) ->
     case ets:match(?CHANNELS, {'$1', '$2', Pid}) of
         [[Key, Rabbit]] ->
@@ -173,18 +169,19 @@ channel_down({Pid, Reason}, State) ->
     end.
 
 node_down(Node, State) ->
-    ets:foldl(fun({Name, Props, Conn}, S) -> 
-                case proplists:get_value(node, Props) of
-                    Node ->
-                        ?error("connection to rabbit ~p was down: nodedown", 
-                            [Name]),
-                        amqp_connection:close(Conn),
-                        ets:delete(?RABBITS, Name),
-                        retry_rabbit({Name, Props}, S);
-                    _ ->
-                        S
-                end
-        end, State, ?RABBITS).
+    ets:foldl(
+      fun({Name, Props, Conn}, S) -> 
+              case proplists:get_value(node, Props) of
+                  Node ->
+                      ?error("connection to rabbit ~p was down: nodedown", 
+                             [Name]),
+                      amqp_connection:close(Conn),
+                      ets:delete(?RABBITS, Name),
+                      retry_rabbit({Name, Props}, S);
+                  _ ->
+                      S
+              end
+      end, State, ?RABBITS).
 
 get_rabbit(Name, State) ->
     case do_get_rabbit(Name) of
