@@ -10,7 +10,7 @@
 ## Function Index ##
 
 
-<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#ack-2">ack/2</a></td><td></td></tr><tr><td valign="top"><a href="#ack-3">ack/3</a></td><td></td></tr><tr><td valign="top"><a href="#bind_exchange-4">bind_exchange/4</a></td><td></td></tr><tr><td valign="top"><a href="#bind_queue-4">bind_queue/4</a></td><td></td></tr><tr><td valign="top"><a href="#cancel_consume-2">cancel_consume/2</a></td><td></td></tr><tr><td valign="top"><a href="#close-1">close/1</a></td><td></td></tr><tr><td valign="top"><a href="#consume_queue-3">consume_queue/3</a></td><td></td></tr><tr><td valign="top"><a href="#consume_queue-4">consume_queue/4</a></td><td></td></tr><tr><td valign="top"><a href="#consumer_count-2">consumer_count/2</a></td><td></td></tr><tr><td valign="top"><a href="#delete_exchange-2">delete_exchange/2</a></td><td></td></tr><tr><td valign="top"><a href="#delete_queue-2">delete_queue/2</a></td><td></td></tr><tr><td valign="top"><a href="#discard-2">discard/2</a></td><td></td></tr><tr><td valign="top"><a href="#get_msg-2">get_msg/2</a></td><td></td></tr><tr><td valign="top"><a href="#get_msg-3">get_msg/3</a></td><td></td></tr><tr><td valign="top"><a href="#msg_count-2">msg_count/2</a></td><td></td></tr><tr><td valign="top"><a href="#publish-4">publish/4</a></td><td></td></tr><tr><td valign="top"><a href="#qos-2">qos/2</a></td><td></td></tr><tr><td valign="top"><a href="#reject-2">reject/2</a></td><td></td></tr><tr><td valign="top"><a href="#start_exchange-3">start_exchange/3</a></td><td></td></tr><tr><td valign="top"><a href="#start_queue-2">start_queue/2</a></td><td></td></tr></table>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#ack-2">ack/2</a></td><td></td></tr><tr><td valign="top"><a href="#ack-3">ack/3</a></td><td></td></tr><tr><td valign="top"><a href="#bind_exchange-4">bind_exchange/4</a></td><td></td></tr><tr><td valign="top"><a href="#bind_queue-4">bind_queue/4</a></td><td></td></tr><tr><td valign="top"><a href="#cancel_consume-2">cancel_consume/2</a></td><td></td></tr><tr><td valign="top"><a href="#close-1">close/1</a></td><td></td></tr><tr><td valign="top"><a href="#consume_queue-3">consume_queue/3</a></td><td></td></tr><tr><td valign="top"><a href="#consume_queue-4">consume_queue/4</a></td><td></td></tr><tr><td valign="top"><a href="#delete_exchange-2">delete_exchange/2</a></td><td></td></tr><tr><td valign="top"><a href="#delete_queue-2">delete_queue/2</a></td><td></td></tr><tr><td valign="top"><a href="#discard-2">discard/2</a></td><td></td></tr><tr><td valign="top"><a href="#get_msg-2">get_msg/2</a></td><td></td></tr><tr><td valign="top"><a href="#get_msg-3">get_msg/3</a></td><td></td></tr><tr><td valign="top"><a href="#publish-4">publish/4</a></td><td></td></tr><tr><td valign="top"><a href="#qos-2">qos/2</a></td><td></td></tr><tr><td valign="top"><a href="#reject-2">reject/2</a></td><td></td></tr><tr><td valign="top"><a href="#start_exchange-3">start_exchange/3</a></td><td></td></tr><tr><td valign="top"><a href="#start_queue-2">start_queue/2</a></td><td></td></tr></table>
 
 
 <a name="functions"></a>
@@ -73,13 +73,6 @@
 `consume_queue(Channel, Queue, Receiver, NoAck) -> any()`
 
 
-<a name="consumer_count-2"></a>
-
-### consumer_count/2 ###
-
-`consumer_count(Channel, Queue) -> any()`
-
-
 <a name="delete_exchange-2"></a>
 
 ### delete_exchange/2 ###
@@ -117,13 +110,6 @@
 get_msg(Channel :: atom(), Queue :: binary(), NoAck :: boolean()) -&gt;empty | binary()
 </code></pre>
 
-
-
-<a name="msg_count-2"></a>
-
-### msg_count/2 ###
-
-`msg_count(Channel, Queue) -> any()`
 
 
 <a name="publish-4"></a>

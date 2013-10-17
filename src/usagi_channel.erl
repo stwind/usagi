@@ -8,8 +8,6 @@
 -export([consume_queue/4]).
 -export([delete_exchange/2]).
 -export([delete_queue/2]).
--export([consumer_count/2]).
--export([msg_count/2]).
 -export([publish/4]).
 -export([cancel_consume/2]).
 -export([ack/2]).
@@ -39,7 +37,7 @@ start_queue(Channel, Queue) ->
     Method = declare_queue(Queue),
     #'queue.declare_ok'{queue=Q,message_count=MC,
         consumer_count=CC} = call_channel(Channel, Method),
-    {Q, MC, CC}.
+    {ok, {Q, MC, CC}}.
 
 delete_exchange(Channel, Name) ->
     Method = #'exchange.delete'{exchange = Name},
@@ -50,14 +48,6 @@ delete_queue(Channel, Queue) ->
     Method = #'queue.delete'{queue = queue(Queue)},
     #'queue.delete_ok'{} = call_channel(Channel, Method),
     ok.
-
-consumer_count(Channel, Queue) ->
-    {_, _, CC} = start_queue(Channel, Queue),
-    CC.
-
-msg_count(Channel, Queue) ->
-    {_, MC, _} = start_queue(Channel, Queue),
-    MC.
 
 publish(Channel, Exchange, Key, Event) ->
     Publish = #'basic.publish'{exchange=Exchange, routing_key=Key},
@@ -91,26 +81,22 @@ consume_queue(Channel, Queue, Receiver, NoAck) ->
 
 cancel_consume(Channel, Tag) ->
     Method = #'basic.cancel'{consumer_tag = Tag,nowait = true},
-    ok = call_channel(Channel, Method),
-    ok.
+    ok = call_channel(Channel, Method).
 
 ack(Channel, Tag) ->
     ack(Channel, Tag, false).
 
 ack(Channel, Tag, Multi) ->
     Ack = #'basic.ack'{delivery_tag = Tag, multiple = Multi},
-    amqp_channel:cast(channel(Channel), Ack),
-    ok.
+    amqp_channel:cast(channel(Channel), Ack).
 
 reject(Channel, Tag) ->
     Reject = #'basic.reject'{delivery_tag = Tag, requeue = true},
-    amqp_channel:cast(channel(Channel), Reject),
-    ok.
+    amqp_channel:cast(channel(Channel), Reject).
 
 discard(Channel, Tag) ->
     Reject = #'basic.reject'{delivery_tag = Tag, requeue = false},
-    amqp_channel:cast(channel(Channel), Reject),
-    ok.
+    amqp_channel:cast(channel(Channel), Reject).
 
 get_msg(Channel, Queue) ->
     get_msg(Channel, Queue, true).
@@ -120,7 +106,7 @@ get_msg(Channel, Queue, NoAck) ->
     Get = #'basic.get'{queue = queue(Queue), no_ack = NoAck},
     case call_channel(Channel, Get) of
         {#'basic.get_ok'{delivery_tag=Dtag}, #amqp_msg{payload = Content}} ->
-            {Dtag, Content};
+            {ok, {Dtag, Content}};
         #'basic.get_empty'{} ->
             empty
     end.
