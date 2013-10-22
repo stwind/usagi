@@ -26,8 +26,6 @@
 -export([get_msg/2]).
 -export([get_msg/3]).
 -export([close_channel/1]).
--export([unpack/1]).
--export([get_msg/0]).
 
 %% ===================================================================
 %% Public
@@ -59,7 +57,7 @@ start_exchange(Channel, Name, Type) ->
     safe_call_channel(start_exchange, [Channel, Name, Type]).
 
 %% @doc start a queue
--spec start_queue(channel(), r_queue()) -> whynot().
+-spec start_queue(channel(), r_queue()) -> whynot({binary(), integer(), integer()}).
 start_queue(Channel, Queue) ->
     safe_call_channel(start_queue, [Channel, Queue]).
 
@@ -137,27 +135,6 @@ get_msg(Channel, Queue, NoAck) ->
 -spec close_channel(channel()) -> whynot().
 close_channel(Channel) ->
     safe_call_channel(close, [Channel]).
-
-unpack(#'basic.consume_ok'{}) ->
-    ignore;
-unpack(#'basic.cancel_ok'{}) ->
-    ignore;
-unpack({#'basic.deliver'{}, #amqp_msg{payload=Payload}}) ->
-    {rabbit_event, Payload};
-unpack(Other) ->
-    Other.
-
-get_msg() ->
-    receive
-        #'basic.consume_ok'{} ->
-            get_msg();
-        #'basic.cancel_ok'{} ->
-            get_msg();
-        {#'basic.deliver'{}, #amqp_msg{payload=Payload}} ->
-            {usagi, Payload};
-        Other ->
-            Other
-    end.
 
 %% ===================================================================
 %% Utils
