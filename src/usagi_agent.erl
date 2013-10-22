@@ -60,8 +60,8 @@ get_channel(Name, Key) ->
 %% ===================================================================
 
 init(Rabbits) ->
-    ets:new(?CHANNELS, [named_table,public]),
-    ets:new(?RABBITS, [named_table,public,{read_concurrency,true}]),
+    _ = ets:new(?CHANNELS, [named_table,public]),
+    _ = ets:new(?RABBITS, [named_table,public,{read_concurrency,true}]),
     {ok, connect_rabbits(Rabbits, #state{})}.
 
 handle_call({add_rabbit, Rabbit}, _From, State) ->
@@ -85,7 +85,7 @@ handle_info({retry_rabbit, Rabbit}, State) ->
     {noreply, connect_rabbits([Rabbit], State)};
 
 handle_info({retry_channel, Rabbit, Key}, State) ->
-    open_channel(Rabbit, Key),
+    _ = open_channel(Rabbit, Key),
     {noreply, State};
 
 handle_info({'DOWN', _, _, Pid, Reason}, State) ->
@@ -118,7 +118,7 @@ do_connect({Name, Props}, State) ->
     AmqpParam = amqp_param(Props),
     case amqp_connection:start(AmqpParam) of
         {ok, Conn} ->
-            monitor_rabbit(Conn, AmqpParam),
+            _ = monitor_rabbit(Conn, AmqpParam),
             rabbit_connected({Name, Props}, Conn, State);
         {error, Reason} ->
             ?error("failed connecting to ~p : ~p", [Name, Reason]),
