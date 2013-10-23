@@ -25,5 +25,13 @@ start_link() ->
 %% ===================================================================
 
 init([]) ->
-    RabbitAgent = ?CHILD(usagi_agent, worker),
-    {ok, {{one_for_one, 5, 10}, [RabbitAgent]}}.
+    case usagi_util:get_rabbits() of
+        [] ->
+            {error, no_rabbit};
+        Rabbits ->
+            RabbitAgent = {
+              usagi_agent, {usagi_agent,start_link,[Rabbits]},
+              permanent, 5000, worker, [usagi_agent]
+             },
+            {ok, {{one_for_one, 5, 10}, [RabbitAgent]}}
+    end.

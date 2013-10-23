@@ -1,0 +1,3 @@
+{application,usagi}.
+{packages,[]}.
+{modules,[usagi,usagi_agent,usagi_app,usagi_channel,usagi_sup,usagi_util]}.
