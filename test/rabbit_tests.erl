@@ -58,14 +58,14 @@ t_a_1() ->
 t_b_1() ->
     {Ch, Exc, Q, Key} = {channel_2, <<"usagi.test">>, 
         <<"usagi_test_q">>, <<"usagi.key">>},
-    {Q, _, _} = usagi:start_queue(Ch, Q),
+    {ok, {Q, _, _}} = usagi:start_queue(Ch, Q),
     Pid = start_worker(),
     {ok, _} = usagi:consume_queue(Ch, Q, Pid, true),
     ok = usagi:start_exchange(Ch, Exc, <<"topic">>),
     ok = usagi:bind_queue(Ch, Exc, Q, Key),
     ok = usagi:publish(Ch, Exc, Key, <<"test_msg">>),
     timer:sleep(100),
-    <<"test_msg">> = check_worker(Pid).
+    <<"test_msg">> = wait_worker(Pid).
 
 %% ===================================================================
 %% Helpers
@@ -86,18 +86,19 @@ get_result(Pid) ->
     end.
 
 start_worker() ->
-    proc_lib:spawn(fun() -> worker() end).
+    Parent = self(),
+    proc_lib:spawn(fun() -> loop(Parent) end).
 
-check_worker(Pid) ->
-    Pid ! {self(), check},
+wait_worker(Pid) ->
     receive
         {Pid, Msg} ->
             Msg
     end.
 
-worker() ->
-    {usagi, Msg} = usagi:get_msg(),
+loop(Parent) ->
     receive
-        {Pid, check} ->
-            Pid ! {self(), Msg}
+        #'basic.consume_ok'{} ->
+            loop(Parent);
+        {#'basic.deliver'{}, #amqp_msg{payload = Msg}} ->
+            Parent ! {self(), Msg}
     end.
