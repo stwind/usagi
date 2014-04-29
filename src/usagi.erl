@@ -9,16 +9,16 @@
 
 -export([new_channel/1]).
 -export([new_channel/2]).
--export([start_exchange/3]).
--export([start_queue/2]).
--export([bind_exchange/4]).
--export([bind_queue/4]).
+-export([start_exchange/3, start_exchange/4]).
+-export([start_queue/2, start_queue/3]).
+-export([bind_exchange/4, bind_exchange/5]).
+-export([bind_queue/4, bind_queue/5]).
 -export([consume_queue/3]).
 -export([consume_queue/4]).
--export([delete_exchange/2]).
--export([delete_queue/2]).
--export([publish/4]).
--export([cancel_consume/2]).
+-export([delete_exchange/2, delete_exchange/3]).
+-export([delete_queue/2, delete_queue/3]).
+-export([publish/4, publish/6]).
+-export([cancel_consume/2, cancel_consume/3]).
 -export([ack/2]).
 -export([ack/3]).
 -export([reject/2]).
@@ -27,15 +27,15 @@
 -export([get_msg/3]).
 -export([close_channel/1]).
 
--type whynot(R) :: {ok, R} | {error, _}.
--type whynot() :: ok | {error, _}.
+-type whynot(R) :: usagi_types:whynot(R).
+-type whynot() :: usagi_types:whynot().
 
--type channel() :: atom() | pid().
--type exchange() :: binary().
--type routing_key() :: binary().
--type rabbit() :: atom().
--type r_queue() :: binary() | {binary(), integer()}.
--type event() :: binary().
+-type channel()     :: usagi_types:channel().
+-type exchange()    :: usagi_types:exchange().
+-type routing_key() :: usagi_types:routing_key().
+-type rabbit()      :: usagi_types:rabbit().
+-type r_queue()     :: usagi_types:r_queue().
+-type event()       :: usagi_types:event().
 
 %% ===================================================================
 %% Public
@@ -66,35 +66,57 @@ new_channel(Rabbit, Name) ->
 start_exchange(Channel, Name, Type) ->
     safe_call_channel(start_exchange, [Channel, Name, Type]).
 
+-spec start_exchange(channel(), exchange(), binary(), proplists:proplist()) -> whynot().
+start_exchange(Channel, Name, Type, Opts) ->
+    safe_call_channel(start_exchange, [Channel, Name, Type, Opts]).
+
 %% @doc start a queue
 -spec start_queue(channel(), r_queue()) -> whynot({binary(), integer(), integer()}).
 start_queue(Channel, Queue) ->
-    safe_call_channel(start_queue, [Channel, Queue]).
+    start_queue(Channel, Queue, []).
+
+start_queue(Channel, Queue, Opts) ->
+    safe_call_channel(start_queue, [Channel, Queue, Opts]).
 
 %% @doc delete an queue
 -spec delete_exchange(channel(), exchange()) -> whynot().
 delete_exchange(Channel, Name) ->
-    safe_call_channel(delete_exchange, [Channel, Name]).
+    delete_exchange(Channel, Name, []).
+
+delete_exchange(Channel, Name, Opts) ->
+    safe_call_channel(delete_exchange, [Channel, Name, Opts]).
 
 %% @doc delete a queue
 -spec delete_queue(channel(), r_queue()) -> whynot().
 delete_queue(Channel, Queue) ->
-    safe_call_channel(delete_queue, [Channel, Queue]).
+    delete_queue(Channel, Queue, []).
+
+delete_queue(Channel, Queue, Opts) ->
+    safe_call_channel(delete_queue, [Channel, Queue, Opts]).
 
 %% @doc publish a message
 -spec publish(channel(), exchange(), routing_key(), event()) -> whynot().
 publish(Channel, Exchange, Key, Event) ->
-    safe_call_channel(publish, [Channel, Exchange, Key, Event]).
+    publish(Channel, Exchange, Key, Event, [], []).
+
+publish(Channel, Exchange, Key, Event, Opts, Props) ->
+    safe_call_channel(publish, [Channel, Exchange, Key, Event, Opts, Props]).
 
 %% @doc bind `Source' exchange to `Destination' exchange
 -spec bind_exchange(channel(), exchange(), exchange(), routing_key()) -> whynot().
 bind_exchange(Channel, Source, Destination, Key) ->
-    safe_call_channel(bind_exchange, [Channel, Source, Destination, Key]).
+    bind_exchange(Channel, Source, Destination, Key, []).
+
+bind_exchange(Channel, Source, Destination, Key, Opts) ->
+    safe_call_channel(bind_exchange, [Channel, Source, Destination, Key, Opts]).
 
 %% @doc bind `Queue' to `Exchange' with `Key' as routing key
 -spec bind_queue(channel(), exchange(), exchange(), routing_key()) -> whynot().
 bind_queue(Channel, Exchange, Queue, Key) ->
-    safe_call_channel(bind_queue, [Channel, Exchange, Queue, Key]).
+    bind_queue(Channel, Exchange, Queue, Key, []).
+
+bind_queue(Channel, Exchange, Queue, Key, Opts) ->
+    safe_call_channel(bind_queue, [Channel, Exchange, Queue, Key, Opts]).
 
 %% @doc Set `Receiver' as a consumer to `Queue'
 -spec consume_queue(channel(), r_queue(), pid()) -> whynot().
@@ -110,6 +132,10 @@ consume_queue(Channel, Queue, Receiver, NoAck) ->
 -spec cancel_consume(channel(), binary()) -> whynot().
 cancel_consume(Channel, Tag) ->
     safe_call_channel(cancel_consume, [Channel, Tag]).
+
+-spec cancel_consume(channel(), binary(), boolean()) -> whynot().
+cancel_consume(Channel, Tag, Nowait) ->
+    safe_call_channel(cancel_consume, [Channel, Tag, Nowait]).
 
 %% @see ack/3
 -spec ack(channel(), binary()) -> whynot().

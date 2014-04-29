@@ -2,14 +2,16 @@
 %% ex: ft=erlang ts=2 sw=2 et
 
 {application, usagi,
-  [
-    {description, "Usagi RabbitMQ Client"},
-    {vsn, git},
-    {registered, []},
-    {applications, [
-        kernel,
-        stdlib
-      ]},
-    {mod, { usagi_app, []}},
-    {env, []}
-  ]}.
+ [
+  {description, "Usagi RabbitMQ Client"},
+  {vsn, git},
+  {registered, [usagi_agent, usagi_sup]},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {modules, [usagi_app, usagi, usagi_agent, usagi_connection, usagi_sup,
+            usagi_util, usagi_types, usagi_channel, usagi_recs]},
+  {mod, { usagi_app, []}},
+  {env, []}
+ ]}.

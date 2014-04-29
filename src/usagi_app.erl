@@ -10,7 +10,7 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
-    usagi_sup:start_link().
+    usagi_sup:start_link(usagi_util:get_rabbits()).
 
 stop(_State) ->
     ok.
