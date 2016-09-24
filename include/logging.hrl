@@ -1,3 +1,5 @@
+-define(debug(Fmt, Args), error_logger:info_msg(Fmt, Args)).
+
 -define(info(Fmt), error_logger:info_msg(Fmt)).
 -define(info(Fmt, Args), error_logger:info_msg(Fmt, Args)).
 

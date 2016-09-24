@@ -3,7 +3,7 @@
 -behaviour(supervisor).
 
 %% API
--export([start_link/0]).
+-export([start_link/1]).
 
 %% Supervisor callbacks
 -export([init/1]).
@@ -17,21 +17,16 @@
 %% API functions
 %% ===================================================================
 
-start_link() ->
-    supervisor:start_link({local, ?MODULE}, ?MODULE, []).
+start_link(Rabbits) ->
+    supervisor:start_link({local, ?MODULE}, ?MODULE, Rabbits).
 
 %% ===================================================================
 %% Supervisor callbacks
 %% ===================================================================
 
-init([]) ->
-    case usagi_util:get_rabbits() of
-        [] ->
-            {error, no_rabbit};
-        Rabbits ->
-            RabbitAgent = {
-              usagi_agent, {usagi_agent,start_link,[Rabbits]},
-              permanent, 5000, worker, [usagi_agent]
-             },
-            {ok, {{one_for_one, 5, 10}, [RabbitAgent]}}
-    end.
+init(Rabbits) ->
+    RabbitAgent = {
+      usagi_agent, {usagi_agent,start_link,[Rabbits]},
+      permanent, 5000, worker, [usagi_agent]
+     },
+    {ok, {{one_for_one, 5, 10}, [RabbitAgent]}}.
